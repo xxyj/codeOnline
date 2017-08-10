@@ -1,0 +1,33 @@
+<!doctype html>
+
+<title>freemarker 在线编辑器</title>
+<meta charset="utf-8" />
+
+<link rel="stylesheet" href="../../../css/codemirror.css">
+<script src="../../../js/codemirror.js"></script>
+<script src="../xml.js"></script>
+<script src="../javascript.js"></script>
+<script src="../css.js"></script>
+<script src="../htmlmixed.js"></script>
+<script src="freemarker.js"></script>
+<script src="freemarkermixed.js"></script>
+<style>
+   
+</style>
+<h2> freemarker 在线编辑器</h2>
+<textarea id="code" name="code"></textarea>
+<script type="text/javascript">
+    (function () {
+        window.onload = function () {
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("code"), {
+                mode: "freemarkermixed",
+                tabSize: 4,
+                indentUnit: 4,
+                indentWithTabs: true,
+                lineNumbers: true
+            });
+        }
+    })()
+</script>
+</body>
+</html>
