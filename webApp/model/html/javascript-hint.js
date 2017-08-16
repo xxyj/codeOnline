@@ -109,7 +109,7 @@
   var props = ("charAt charCodeAt codePointAt fromCodePoint at includes startsWith endsWith indexOf lastIndexOf substring substr async slice trim trimLeft trimRight " +
     "toUpperCase isFinite defineProperty isNaN  repeat toLowerCase split concat match replace search ength concat join splice push pop shift unshift slice reverse sort indexOf " +
     "lastIndexOf fill Reflect from of copyWithin find findIndex entries keys values includes every some filter forEach map reduce reduceRight prototype apply call bind break case catch continue debugger default delete do else false finally for function " +
-    "if in instanceof Proxy Symbol Promise yield class import export extends Map Set assign new null let const return switch throw true try typeof var void while with").split(" ");
+    "if in instanceof alert window confirm console log Proxy Symbol Promise yield class import export extends Map Set assign new null let const return switch throw true try typeof var void while with").split(" ");
   // var stringProps = ("charAt charCodeAt indexOf lastIndexOf substring substr slice trim trimLeft trimRight " +
   //                    "toUpperCase toLowerCase split concat match replace search").split(" ");
   // var arrayProps = ("length concat join splice push pop shift unshift slice reverse sort indexOf " +
