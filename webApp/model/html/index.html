@@ -1,0 +1,172 @@
+<!doctype html>
+
+<head>
+    <title>前端代码在线编辑</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../css/ambiance.css">
+    <link rel="stylesheet" href="../../css/codemirror.css">
+    <!--全屏模式-->
+    <link rel="stylesheet" href="../../css/fullscreen.css">
+    <link rel="stylesheet" href="../../css/show-hint.css">
+    <style type='text/css' rel="stylesheet">
+        body {
+            background: #dbdbdb;
+        }
+
+        .warp {
+            display: flex;
+            position: absolute;
+            top: 60px;
+            bottom: 300px;
+            left: 0px;
+            right: 0px;
+        }
+
+        input[type='button'] {
+            cursor: pointer;
+            width: 80px;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        p {
+            position: absolute;
+            margin-top: -20px;
+        }
+
+        .item {
+            width: 33.3%;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+        }
+
+        textarea:focus {
+            outline: 0;
+            /* Chrome */
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <input type="button" value="运行" />
+        <input type="button" value="清空" />
+    </div>
+    <div class="warp">
+        <div class='item'>
+            <p>html</p>
+            <textarea id="html"></textarea>
+        </div>
+        <div class='item'>
+            <p>javascript</p>
+            <textarea id="javascript"></textarea>
+        </div>
+        <div class='item'>
+            <p>css</p>
+            <textarea id="css"></textarea>
+        </div>
+
+    </div>
+    <iframe class='item' frameborder="0"></iframe>
+    <script src="../../js/codemirror.js"></script>
+    <!--全屏模式-->
+    <script src="../../js/fullscreen.js"></script>
+    <!--显示html相关插件-->
+    <script src="xml.js"></script>
+    <script src="javascript.js"></script>
+    <script src="css.js"></script>
+    <script src="htmlmixed.js"></script>
+
+    <!--代码提示-->
+    <script src="../../js/show-hint.js"></script>
+    <script src="javascript-hint.js"></script>
+    <script src="html-hint.js"></script>
+    <script src="css-hint.js"></script>
+
+    <!--显示vue的插件-->
+    <!--<script src="vue.js"></script>-->
+    <!--关闭标签-->
+    <script src="../../js/xml-fold.js"></script>
+    <script src="../../js/closetag.js"></script>
+    <script type="text/javascript">
+        (function () {
+            window.onload = function () {
+                let jsObj = {
+                    // 选用的模板
+                    mode: "javascript",
+                    // tab 产生的个空格
+                    tabSize: 4,
+                    // 缩进单位
+                    indentUnit: 4,
+                    // tab 产生的个空格
+                    indentWithTabs: true,
+                    // 是否显示行号
+                    lineNumbers: true,
+                    theme: "ambiance",
+                    //自动关闭标签
+                    autoCloseTags: true,
+                    //全屏模式
+                    fullScreen: false,
+                    // theme: "night",
+                    extraKeys: {
+                        "Ctrl-F": function (cm) {
+                            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                        },
+                        "Esc": function (cm) {
+                            if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        },
+                    },
+                }
+                let htmlObj = JSON.parse(JSON.stringify(jsObj))
+                let cssObj = JSON.parse(JSON.stringify(jsObj))
+                htmlObj.mode = "text/html"
+                cssObj.mode = "css"
+                let jsCodeMirror = CodeMirror.fromTextArea(document.getElementById("javascript"), jsObj);
+                let htmlCodeMirror = CodeMirror.fromTextArea(document.getElementById("html"), htmlObj);
+                let cssCodeMirror = CodeMirror.fromTextArea(document.getElementById("css"), cssObj);
+                jsCodeMirror.on("change", function (editor, change) {
+                    showTips(editor, change, 2)
+                });
+                htmlCodeMirror.on("change", function (editor, change) {
+                    showTips(editor, change, 0)
+                });
+                cssCodeMirror.on("change", function (editor, change) {
+                    showTips(editor, change, 1)
+                });
+                var showTips = function (editor, change, type) {
+                    //任意键触发autocomplet
+                    if (change.origin == "+input") {
+                        var text = change.text;
+                        if (!ignoreToken(text)) {
+                            return;
+                        }
+                        setTimeout(function () {
+                            switch (type) {
+                                case 0:
+                                    htmlCodeMirror.execCommand("autocomplete");
+                                    break;
+                                case 1:
+                                    cssCodeMirror.execCommand("autocomplete");
+                                    break;
+                                case 2:
+                                    jsCodeMirror.execCommand("autocomplete");
+                                    break;
+                            }
+
+                        }, 20);
+                    }
+                }
+                var ignoreToken = function (text) {
+                    var reg = /^[a-zA-Z\.]+$/;
+                    return reg.test(text[0])
+                }
+            }
+        })()
+    </script>
+</body>
+
+</p>
