@@ -15,7 +15,7 @@
     if (old == CodeMirror.Init) old = false;
     if (!old == !val) return;
     if (val) setFullscreen(cm);
-    else setNormal(cm);
+    else setNormal(cm); 
   });
 
   function setFullscreen(cm) {

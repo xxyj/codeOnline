@@ -125,12 +125,13 @@
       this.data = data;
 
       if (data && data.list.length) {
-        if (picked && data.list.length == 1) {
-          this.pick(data, 0);
-        } else {
+        // 不要默认选中第一个
+        // if (picked && data.list.length == 1) {
+        //   this.pick(data, 0);
+        // } else {
           this.widget = new Widget(this, data);
           CodeMirror.signal(data, "shown");
-        }
+        //}
       }
     }
   };
