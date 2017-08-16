@@ -1,0 +1,18 @@
+<script>
+    window.addEventListener("message", function (event) {
+        // 把父窗口发送过来的数据显示在子窗口中
+        if (event.data.html) {
+            document.body.innerHTML = event.data.html
+        }
+        if (event.data.js) {
+            let script = document.createElement("script");
+            document.body.appendChild(script);
+            script.innerHTML=event.data.js
+        }
+        if(event.data.css){
+            let style = document.createElement("style");
+            document.head.appendChild(style);
+            style.innerHTML=event.data.css
+        }
+    }, false);
+</script>
