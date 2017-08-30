@@ -1,18 +1,71 @@
 <script>
     window.addEventListener("message", function (event) {
+        document.body.innerHTML = "";
+        document.head.innerHTML = "";
         // 把父窗口发送过来的数据显示在子窗口中
         if (event.data.html) {
             document.body.innerHTML = event.data.html
         }
-        if (event.data.js) {
+        var loadJs = function () {
             let script = document.createElement("script");
+            script.type = "text/javascript"
+            if (event.data.type && event.data.type === "react") {
+                script.type = "text/babel"
+            }
             document.body.appendChild(script);
-            script.innerHTML=event.data.js
+            script.innerHTML = event.data.js
+            document.body.style.display = "block";
         }
-        if(event.data.css){
+        var loadLib = function (url) {
+            let t = document.createElement("script");
+            t.src = url;
+            t.type = "text/javascript"
+            document.head.appendChild(t);
+            t.onload = function () {
+                loadNum++;
+                if (loadNum === 3) {
+                    loadJs();
+                }
+            }
+        }
+        if (event.data.type && event.data.type != "javascript") {
+            var loadNum = 0;
+            if (event.data.type === "react") {
+                loadLib("https://cdn.bootcss.com/react/15.4.2/react.min.js");
+                loadLib("https://cdn.bootcss.com/react/15.4.2/react-dom.min.js");
+                loadLib("https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js");
+            } else {
+                var libjs = document.createElement("script");
+                libjs.type = "text/javascript"
+                libjs.async = "async";
+                libjs.src = "../lib/" + event.data.type + ".min.js";
+                document.head.appendChild(libjs);
+                document.body.style.display = "none";
+                libjs.onload = function () {
+                    loadJs();
+                }
+            }
+        } else {
+            loadJs();
+        }
+
+        // if (event.data.js) {
+
+        //    let script = document.createElement("script");
+        //         script.type = "text/javascript"
+
+        //         if (event.data.type && event.data.type === "react") {
+        //             script.type = "text/babel"
+        //         }
+        //         document.body.appendChild(script);
+        //         script.innerHTML = event.data.js
+        //         document.body.style.display = "block";
+
+        // }
+        if (event.data.css) {
             let style = document.createElement("style");
             document.head.appendChild(style);
-            style.innerHTML=event.data.css
+            style.innerHTML = event.data.css
         }
     }, false);
 </script>

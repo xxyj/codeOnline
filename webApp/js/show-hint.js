@@ -434,6 +434,5 @@
     customKeys: null,
     extraKeys: null
   };
-
   CodeMirror.defineOption("hintOptions", null);
 });

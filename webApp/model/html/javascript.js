@@ -826,5 +826,6 @@ CodeMirror.defineMIME("application/x-json", {name: "javascript", json: true});
 CodeMirror.defineMIME("application/ld+json", {name: "javascript", jsonld: true});
 CodeMirror.defineMIME("text/typescript", { name: "javascript", typescript: true });
 CodeMirror.defineMIME("application/typescript", { name: "javascript", typescript: true });
-
+CodeMirror.defineMIME("vue", "javascript");
+CodeMirror.defineMIME("react", "javascript");
 });

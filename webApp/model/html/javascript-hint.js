@@ -31,12 +31,11 @@
     return arr.indexOf(item) != -1;
   }
 
-  function scriptHint(editor, keywords, getToken, options) {
+  function scriptHint(editor, getToken, options) {
     // Find the token at the cursor
     var cur = editor.getCursor(), token = getToken(editor, cur);
     if (/\b(?:string|comment)\b/.test(token.type)) return;
     token.state = CodeMirror.innerMode(editor.getMode(), token.state).state;
-
     // If it's not a 'word-style' token, ignore the token.
     if (!/^[\w$_]*$/.test(token.string)) {
       token = {
@@ -53,24 +52,42 @@
 
     var tprop = token;
     // If it is a property, find out what it is a property of.
-    while (tprop.type == "property") {
+    while (tprop.type == "property" || tprop.type === null) {
       tprop = getToken(editor, Pos(cur.line, tprop.start));
       if (tprop.string != ".") return;
       tprop = getToken(editor, Pos(cur.line, tprop.start));
+      // 取全文同名变量最后一次赋值的位置
+      if (tprop.type === "variable") {
+        let value = editor.getValue();
+        let reg =
+          "(?:\\\s+|^)" +
+          tprop.string +
+          "(?:\\\s)*=(?:\\\s)*([^(?:\\r\\n,;)]*)";
+        let arr = value.match(new RegExp(reg, "g"));
+        if (arr && arr.length > 0) {
+          try {
+            let v = eval(arr[arr.length - 1].split("=")[1]);
+            let type = Object.prototype.toString.call(v);
+            tprop.string = type.match(/\s+([^\]]*)/)[1];
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }
       if (!context) var context = [];
       context.push(tprop);
     }
     return {
-      list: getCompletions(token, context, keywords, options),
+      list: getCompletions(token, context, options),
       from: Pos(cur.line, token.start),
       to: Pos(cur.line, token.end)
     };
   }
 
   function javascriptHint(editor, options) {
+    this.type = editor.options.type;
     return scriptHint(
       editor,
-      props,
       function(e, cur) {
         return e.getTokenAt(cur);
       },
@@ -80,9 +97,6 @@
   CodeMirror.registerHelper("hint", "javascript", javascriptHint);
 
   function getCoffeeScriptToken(editor, cur) {
-    // This getToken, it is for coffeescript, imitates the behavior of
-    // getTokenAt method in javascript.js, that is, returning "property"
-    // type and treat "." as indepenent token.
     var token = editor.getTokenAt(cur);
     if (cur.ch == token.start + 1 && token.string.charAt(0) == ".") {
       token.end = token.start;
@@ -97,40 +111,63 @@
   }
 
   function coffeescriptHint(editor, options) {
-    return scriptHint(
-      editor,
-      props,
-      getCoffeeScriptToken,
-      options
-    );
+    return scriptHint(editor, getCoffeeScriptToken, options);
   }
   CodeMirror.registerHelper("hint", "coffeescript", coffeescriptHint);
 
-  var props = ("charAt charCodeAt codePointAt fromCodePoint at includes startsWith endsWith indexOf lastIndexOf substring substr async slice trim trimLeft trimRight " +
-    "toUpperCase isFinite defineProperty isNaN  repeat toLowerCase split concat match replace search ength concat join splice push pop shift unshift slice reverse sort indexOf " +
-    "lastIndexOf fill Reflect from of copyWithin find findIndex entries keys values includes every some filter forEach map reduce reduceRight prototype apply call bind break case catch continue debugger default delete do else false finally for function " +
-    "if in instanceof alert window confirm console log Proxy Symbol Promise yield class import export extends Map Set assign new null let const return switch throw true try typeof var void while with").split(" ");
-  // var stringProps = ("charAt charCodeAt indexOf lastIndexOf substring substr slice trim trimLeft trimRight " +
-  //                    "toUpperCase toLowerCase split concat match replace search").split(" ");
-  // var arrayProps = ("length concat join splice push pop shift unshift slice reverse sort indexOf " +
-  //                   "lastIndexOf every some filter forEach map reduce reduceRight ").split(" ");
-  // var funcProps = "prototype apply call bind".split(" ");
-  //  var javascriptKeywords = ("break case catch continue debugger default delete do else false finally for function " +
-  //                 "if in instanceof new null return switch throw true try typeof var void while with").split(" ");
-  // var coffeescriptKeywords = ("and break catch class continue delete do else extends false finally for " +
-  //                 "if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
-
   function forAllProps(obj, callback) {
+    let regularArr =
+      ("init data computed directive extend Regular implement  filter animation component use $compile destory" +
+      "config parse $inject $watch $unwatch $update $get $refs $on $off $emit $mute $bind $root $outer").split(
+        " "
+      );
+    let vueArr =
+      ("init vue computed directive extend nextTick  filter set delete component use mixin compile version data props propsData methods watch render renderError " +
+      "beforeCreate created beforeMount mounted beforeUpdate updated activated deactivated beforeDestroy destroyed  delimiters model inheritAttrs comments" +
+      "$data $props $el $options $parent $root $children $slots $slots $refs $isServer $attrs $listeners $watch $set $delete $on $once $off $emit $mount $forceUpdate $nextTick $destroy").split(
+        " "
+      );
+    let reactArr =
+      ("React ReactDOM " +
+      "").split(
+        " "
+      );
+    switch (this.type) {
+      case "regular":
+        regularArr.forEach(callback);
+        break;
+      case "vue":
+        vueArr.forEach(callback);
+        break;
+      case "react":
+        reactArr.forEach(callback);
+        break;
+      default:
+        break;
+    }
     if (!Object.getOwnPropertyNames || !Object.getPrototypeOf) {
       for (var name in obj)
         callback(name);
     } else {
-      for (var o = obj; o; o = Object.getPrototypeOf(o))
-        Object.getOwnPropertyNames(o).forEach(callback);
+      // 需要将原型中不可枚举的数据也给列出来
+      if (obj == window.document || obj == window.Document) {
+        obj = window.document;
+        for (var o = obj; o; o = o.prototype) {
+          Object.getOwnPropertyNames(o).forEach(callback);
+        }
+        obj = window.Document;
+        for (var o = obj; o; o = o.prototype) {
+          Object.getOwnPropertyNames(o).forEach(callback);
+        }
+      } else {
+        for (var o = obj; o; o = o.prototype) {
+          Object.getOwnPropertyNames(o).forEach(callback);
+        }
+      }
     }
   }
 
-  function getCompletions(token, context, keywords, options) {
+  function getCompletions(token, context, options) {
     var found = [],
       start = token.string,
       global = (options && options.globalScope) || window;
@@ -139,26 +176,20 @@
         found.push(str);
     }
     function gatherCompletions(obj) {
-      //if (typeof obj == "string") forEach(stringProps, maybeAdd);
-      //else if (obj instanceof Array) forEach(arrayProps, maybeAdd);
-      //else if (obj instanceof Function) forEach(funcProps, maybeAdd);
-      forEach(props,maybeAdd)
       forAllProps(obj, maybeAdd);
     }
     if (context && context.length) {
-      // If this is a property, see if it belongs to some object we can
-      // find in the current environment.
       var obj = context.pop(), base;
       if (obj.type && obj.type.indexOf("variable") === 0) {
         if (options && options.additionalContext)
           base = options.additionalContext[obj.string];
         if (!options || options.useGlobalScope !== false)
           base = base || global[obj.string];
-      } else if (obj.type == "string") {
-        base = "";
+      } else if (obj.type.toLowerCase() == "string") {
+        base = String;
       } else if (obj.type == "atom") {
         base = 1;
-      } else if (obj.type == "function") {
+      } else if (obj.type.toLowerCase() == "function") {
         if (
           global.jQuery != null &&
           (obj.string == "$" || obj.string == "jQuery") &&
@@ -172,16 +203,20 @@
       }
       while (base != null && context.length)
         base = base[context.pop().string];
-      //if (base != null) gatherCompletions(base);
+      if (base != null) gatherCompletions(base);
     } else {
-      // If not, just look in the global object and any local scope
-      // (reading into JS mode internals to get at the local and global variables)
       for (var v = token.state.localVars; v; v = v.next)
         maybeAdd(v.name);
       for (var v = token.state.globalVars; v; v = v.next)
         maybeAdd(v.name);
-      if (!options || options.useGlobalScope !== false)
-        // gatherCompletions(global);
+      if (!options || options.useGlobalScope !== false) {
+        gatherCompletions(global);
+      }
+
+      var keywords = ("break case catch continue debugger default delete do else false finally for function " +
+        "if in instanceof new null return switch throw true try typeof var let const  void while with").split(
+        " "
+      );
       forEach(keywords, maybeAdd);
     }
     return found;

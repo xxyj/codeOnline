@@ -17,7 +17,7 @@
             display: flex;
             position: absolute;
             top: 60px;
-            bottom: 200px;
+            bottom: 250px;
             left: 0px;
             right: 0px;
             /*overflow: hidden;*/
@@ -32,7 +32,8 @@
 
         p {
             position: absolute;
-            margin-top: -20px;
+            margin-top: -25px;
+            margin-left: 10px;
         }
 
         .item {
@@ -53,8 +54,14 @@
         iframe {
             position: absolute;
             bottom: 0px;
-            height: 200px;
+            height: 250px;
             width: 100%;
+        }
+
+        input[type='button'] {
+            height: 30px;
+            width: 50px;
+            line-height: 30px;
         }
     </style>
 </head>
@@ -62,7 +69,6 @@
 <body>
     <div>
         <input id='run' type="button" value="运行" />
-        <input type="button" value="清空" />
     </div>
     <div class="warp">
         <div class='item'>
@@ -70,7 +76,15 @@
             <textarea id="html"></textarea>
         </div>
         <div class='item'>
-            <p>javascript</p>
+            <p>
+                <select id="jsType">
+                  <option selected value="javascript">javascript</option> 
+                  <option value="regular">regular0.5.2</option> 
+                  <option value="vue">vue2.4.2</option> 
+                  <option value="react">react15.4.2(待完善)</option> 
+                </select>
+                <input type="button" value="demo" id='demoBtn' />
+            </p>
             <textarea id="javascript"></textarea>
         </div>
         <div class='item'>
@@ -103,10 +117,12 @@
     <script src="../../js/closetag.js"></script>
     <script type="text/javascript">
         (function () {
+
             window.onload = function () {
                 let jsObj = {
                     // 选用的模板
                     mode: "javascript",
+                    type: "javascript",
                     // tab 产生的个空格
                     tabSize: 4,
                     // 缩进单位
@@ -173,12 +189,63 @@
                     var reg = /^[a-zA-Z\.]+$/;
                     return reg.test(text[0])
                 }
+                var type = "javascript";
+
+                document.getElementById("jsType").onchange = function () {
+                    htmlCodeMirror.setValue(" ")
+                    jsCodeMirror.setValue(" ");
+                    cssCodeMirror.setValue(" ");
+                    type = this.value;
+                    jsCodeMirror.setOption("type", type)
+                }
+
+                document.getElementById("demoBtn").onclick = function () {
+                    switch (document.getElementById("jsType").value) {
+                        case "javascript":
+                            htmlCodeMirror.setValue(`<div id="app"></div>`)
+                            jsCodeMirror.setValue(
+                                "document.getElementById('app').innerHTML='Hello xiongxu'");
+                            break;
+                        case "react":
+                            htmlCodeMirror.setValue(" ")
+                            jsCodeMirror.setValue(" ");
+                            break;
+                        case "vue":
+                            htmlCodeMirror.setValue(
+                                `<div id="app">
+    {{ message }}
+</div>`
+                            );
+                            jsCodeMirror.setValue(
+                                `var app = new Vue({
+    el: '#app',
+    data: {
+        message: 'Hello xiongxu!'
+    }
+})`
+                            );
+                            break;
+                        case "regular":
+                            htmlCodeMirror.setValue("22")
+
+                            jsCodeMirror.setValue(
+                                `new (Regular.extend({
+    template: '#hello',
+    data: {message: "xiongxu"}
+}))().$inject('#app');`
+                            );
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 document.getElementById("run").onclick = function () {
                     //  向iframe发数据啦
                     window.frames[0].postMessage({
                         // document.getElementById('myIFrame').contentWindow.postMessage({
                         html: htmlCodeMirror.getValue(),
                         js: jsCodeMirror.getValue(),
+                        type: type,
                         css: cssCodeMirror.getValue()
                     }, '*')
                 }

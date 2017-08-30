@@ -8,7 +8,7 @@ h2{
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
   font-family: monospace;
-  height: 500px;
+  height: 100%;
   color: black;
   direction: ltr;
   border:1px solid #dbdbdb;
