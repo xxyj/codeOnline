@@ -1,6 +1,7 @@
+结果显示在这里
 <script>
     window.addEventListener("message", function (event) {
-        document.body.innerHTML = "";
+        document.body.innerHTML = " ";
         document.head.innerHTML = "";
         // 把父窗口发送过来的数据显示在子窗口中
         if (event.data.html) {
@@ -9,12 +10,12 @@
         var loadJs = function () {
             let script = document.createElement("script");
             script.type = "text/javascript"
-            if (event.data.type && event.data.type === "react") {
-                script.type = "text/babel"
-            }
+            // if (event.data.type && event.data.type === "react") {
+            //     script.type = "text/babel"
+            // }
             document.body.appendChild(script);
             script.innerHTML = event.data.js
-            document.body.style.display = "block";
+            document.body.style.visibility = "visible";
         }
         var loadLib = function (url) {
             let t = document.createElement("script");
@@ -23,7 +24,7 @@
             document.head.appendChild(t);
             t.onload = function () {
                 loadNum++;
-                if (loadNum === 3) {
+                if (loadNum === 2) {
                     loadJs();
                 }
             }
@@ -33,14 +34,14 @@
             if (event.data.type === "react") {
                 loadLib("https://cdn.bootcss.com/react/15.4.2/react.min.js");
                 loadLib("https://cdn.bootcss.com/react/15.4.2/react-dom.min.js");
-                loadLib("https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js");
+                // loadLib("https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js");
+
             } else {
                 var libjs = document.createElement("script");
                 libjs.type = "text/javascript"
-                libjs.async = "async";
                 libjs.src = "../lib/" + event.data.type + ".min.js";
                 document.head.appendChild(libjs);
-                document.body.style.display = "none";
+                document.body.style.visibility = "hidden";
                 libjs.onload = function () {
                     loadJs();
                 }

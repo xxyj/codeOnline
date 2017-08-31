@@ -25,9 +25,10 @@
 
         input[type='button'] {
             cursor: pointer;
-            width: 80px;
+            width: 60px;
             height: 40px;
             line-height: 40px;
+            font-size: 16px;
         }
 
         p {
@@ -57,12 +58,6 @@
             height: 250px;
             width: 100%;
         }
-
-        input[type='button'] {
-            height: 30px;
-            width: 50px;
-            line-height: 30px;
-        }
     </style>
 </head>
 
@@ -84,6 +79,7 @@
                   <option value="react">react15.4.2(待完善)</option> 
                 </select>
                 <input type="button" value="demo" id='demoBtn' />
+                <a href="https://babeljs.io/repl" id="jsxToJs" style="display:none" target="_Blank" />jsx转js</a>
             </p>
             <textarea id="javascript"></textarea>
         </div>
@@ -117,7 +113,14 @@
     <script src="../../js/closetag.js"></script>
     <script type="text/javascript">
         (function () {
-
+            var keyObj = {
+                "Ctrl-F": function (cm) {
+                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                },
+                "Esc": function (cm) {
+                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                },
+            }
             window.onload = function () {
                 let jsObj = {
                     // 选用的模板
@@ -137,19 +140,14 @@
                     //全屏模式
                     fullScreen: false,
                     // theme: "night",
-                    extraKeys: {
-                        "Ctrl-F": function (cm) {
-                            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-                        },
-                        "Esc": function (cm) {
-                            if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-                        },
-                    },
+                    extraKeys: keyObj,
                 }
                 let htmlObj = JSON.parse(JSON.stringify(jsObj))
                 let cssObj = JSON.parse(JSON.stringify(jsObj))
                 htmlObj.mode = "text/html"
                 cssObj.mode = "css"
+                htmlObj.extraKeys = keyObj;
+                cssObj.extraKeys = keyObj;
                 let jsCodeMirror = CodeMirror.fromTextArea(document.getElementById("javascript"), jsObj);
                 let htmlCodeMirror = CodeMirror.fromTextArea(document.getElementById("html"), htmlObj);
                 let cssCodeMirror = CodeMirror.fromTextArea(document.getElementById("css"), cssObj);
@@ -190,13 +188,18 @@
                     return reg.test(text[0])
                 }
                 var type = "javascript";
-
+                var tojs  = document.getElementById("jsxToJs");
                 document.getElementById("jsType").onchange = function () {
                     htmlCodeMirror.setValue(" ")
                     jsCodeMirror.setValue(" ");
                     cssCodeMirror.setValue(" ");
                     type = this.value;
                     jsCodeMirror.setOption("type", type)
+                    if(type==="react"){
+                        tojs.style.display="inline-block";
+                    }else{
+                        tojs.style.display="none";
+                    }
                 }
 
                 document.getElementById("demoBtn").onclick = function () {
@@ -204,11 +207,17 @@
                         case "javascript":
                             htmlCodeMirror.setValue(`<div id="app"></div>`)
                             jsCodeMirror.setValue(
-                                "document.getElementById('app').innerHTML='Hello xiongxu'");
+                                "document.getElementById('app').innerHTML='Hello xiongxu,I am js'");
                             break;
                         case "react":
-                            htmlCodeMirror.setValue(" ")
-                            jsCodeMirror.setValue(" ");
+                            htmlCodeMirror.setValue(`<div id="app"></div>`)
+                            jsCodeMirror.setValue(
+                                ` ReactDOM.render(React.createElement(
+     "h1",
+     null,
+     "Hello xiongxu I am react!"
+    ), document.getElementById("app"));`
+                            );
                             break;
                         case "vue":
                             htmlCodeMirror.setValue(
@@ -220,17 +229,17 @@
                                 `var app = new Vue({
     el: '#app',
     data: {
-        message: 'Hello xiongxu!'
+        message: 'Hello xiongxu,I am vue'
     }
 })`
                             );
                             break;
                         case "regular":
-                            htmlCodeMirror.setValue("22")
+                            htmlCodeMirror.setValue('<div id="app">\</div>')
 
                             jsCodeMirror.setValue(
                                 `new (Regular.extend({
-    template: '#hello',
+    template: 'hello,{message},I am regular',
     data: {message: "xiongxu"}
 }))().$inject('#app');`
                             );
