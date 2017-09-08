@@ -1,10 +1,8 @@
 # codeOnline
 ### 实现一个在线代码编辑器
-+ vue在线编辑器
-+ react在线编辑器
-+ reguarjs在线编辑器
-+ markdown在线编辑器
-+ java，c#，c++,freemarker等只显示前端部分，后端部分还需要自己做哦~
++ web在线代码编辑器，支持js支持原生以及vue regular react等框架
++ 代码高亮，代码只能提示，全屏等功能都具备
 
+### (演示地址)[https://xxyj.github.io/codeOnline/model/html/index.html]
 
 ### 基于[codemirror](http://codemirror.net/)
