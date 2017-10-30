@@ -25,7 +25,7 @@
 
         input[type='button'] {
             cursor: pointer;
-            width: 60px;
+            width: 70px;
             height: 40px;
             line-height: 40px;
             font-size: 16px;
@@ -63,7 +63,7 @@
 
 <body>
     <div>
-        <input id='run' type="button" value="运行" />
+        <input id='run' type="button" value="运行" /><span style="display:inline-block;margin-left:50px">快捷键说明：Ctrl+F(全屏)，ESC(退出全屏)，cmd+d(删除一行)，还有很多，自己摸索吧!</span>
     </div>
     <div class="warp">
         <div class='item'>
@@ -106,8 +106,6 @@
     <script src="html-hint.js"></script>
     <script src="css-hint.js"></script>
 
-    <!--显示vue的插件-->
-    <!--<script src="vue.js"></script>-->
     <!--关闭标签-->
     <script src="../../js/xml-fold.js"></script>
     <script src="../../js/closetag.js"></script>
@@ -188,17 +186,17 @@
                     return reg.test(text[0])
                 }
                 var type = "javascript";
-                var tojs  = document.getElementById("jsxToJs");
+                var tojs = document.getElementById("jsxToJs");
                 document.getElementById("jsType").onchange = function () {
                     htmlCodeMirror.setValue(" ")
                     jsCodeMirror.setValue(" ");
                     cssCodeMirror.setValue(" ");
                     type = this.value;
                     jsCodeMirror.setOption("type", type)
-                    if(type==="react"){
-                        tojs.style.display="inline-block";
-                    }else{
-                        tojs.style.display="none";
+                    if (type === "react") {
+                        tojs.style.display = "inline-block";
+                    } else {
+                        tojs.style.display = "none";
                     }
                 }
 

@@ -1,0 +1,134 @@
+<!doctype html>
+
+<head>
+    <title>前端代码在线编辑</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../css/ambiance.css">
+    <link rel="stylesheet" href="../../css/codemirror.css">
+    <link rel=stylesheet href="../../css/merge.css">
+
+    <style type='text/css' rel="stylesheet">
+        html,body,#view,.CodeMirror-merge,.CodeMirror-merge-pane,.CodeMirror-merge .CodeMirror{
+            height:100%;
+            margin:0px;
+            border:0px;
+            padding:0px;
+        }
+        body {
+            background: #dbdbdb;
+             overflow-y: hidden;
+        }
+
+        .CodeMirror {
+            line-height: 1.2;
+        }
+
+        @media screen and (min-width: 1300px) {
+            article {
+                max-width: 1000px;
+            }
+            #nav {
+                border-right: 499px solid transparent;
+            }
+        }
+
+        span.clicky {
+            cursor: pointer;
+            background: #d70;
+            color: white;
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+
+        .CodeMirror-merge-r-chunk {
+            background: #611e1e;
+        }
+
+        .CodeMirror-merge-r-chunk-end,
+        .CodeMirror-merge-r-chunk-start {
+            border: 1px solid #611e1e;
+        }
+    </style>
+</head>
+
+<body>
+    <div id=view></div>
+    <script src="../../js/codemirror.js"></script>
+    <!--显示html相关插件-->
+    <script src="xml.js"></script>
+    <script src="javascript.js"></script>
+    <script src="css.js"></script>
+    <script src="htmlmixed.js"></script>
+
+    <script src="freemarker/freemarker.js"></script>
+    <script src="freemarker/freemarkermixed.js"></script>
+
+    <!--内容对比-->
+    <script src="../../js/diff.js"></script>
+    <script src="../../js/merge.js"></script>
+    <script>
+        var left="", right="", dv, panes = 2,
+            highlight = true,
+            connect = "align",
+            collapse = false;
+
+        function initUI() {
+            var target = document.getElementById("view");
+            target.innerHTML = "";
+            dv = CodeMirror.MergeView(target, {
+                value: left,
+                orig: right,
+                mode: "freemarkermixed",
+                theme: "ambiance",
+                allowEditingOriginals: true,
+                lineNumbers: true,
+                mode: "text/html",
+                revertButtons: true,
+                highlightDifferences: highlight,
+                connect: connect,
+                collapseIdentical: collapse
+            });
+        }
+
+        function toggleDifferences() {
+            dv.setShowDifferences(highlight = !highlight);
+        }
+
+        window.onload = function () {
+            left = localStorage && localStorage.getItem("leftContent")
+            right = localStorage && localStorage.getItem("rightContent")
+            initUI();
+            let d = document.createElement("div");
+            d.style.cssText = "width: 50px; margin: 7px; height: 14px";
+            dv.editor().addLineWidget(57, d)
+        };
+
+        function mergeViewHeight(mergeView) {
+            function editorHeight(editor) {
+                if (!editor) return 0;
+                return editor.getScrollInfo().height;
+            }
+            return Math.max(editorHeight(mergeView.leftOriginal()),
+                editorHeight(mergeView.editor()),
+                editorHeight(mergeView.rightOriginal()));
+        }
+
+        function resize(mergeView) {
+            var height = mergeViewHeight(mergeView);
+            for (;;) {
+                if (mergeView.leftOriginal())
+                    mergeView.leftOriginal().setSize(null, height);
+                mergeView.editor().setSize(null, height);
+                if (mergeView.rightOriginal())
+                    mergeView.rightOriginal().setSize(null, height);
+
+                var newHeight = mergeViewHeight(mergeView);
+                if (newHeight >= height) break;
+                else height = newHeight;
+            }
+            mergeView.wrap.style.height = height + "px";
+        }
+    </script>
+</body>
+
+</p>
