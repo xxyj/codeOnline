@@ -63,7 +63,9 @@
 
 <body>
     <div>
-        <input id='run' type="button" value="运行" /><span style="display:inline-block;margin-left:50px">快捷键说明：Ctrl+F(全屏)，ESC(退出全屏)，cmd+d(删除一行)，还有很多，自己摸索吧!</span>
+        <input id='run' type="button" value="运行" />
+        <a href="diff.html" target="_blank">代码比较</a>
+        <span style="display:inline-block;margin-left:50px">快捷键说明：Ctrl+F(全屏)，ESC(退出全屏)，cmd+d(删除一行)，还有很多，自己摸索吧!</span>
     </div>
     <div class="warp">
         <div class='item'>
@@ -158,6 +160,11 @@
                 cssCodeMirror.on("change", function (editor, change) {
                     showTips(editor, change, 1)
                 });
+                if (localStorage) {
+                    jsCodeMirror.setValue(localStorage.jsContent)
+                    cssCodeMirror.setValue(localStorage.cssContent)
+                    htmlCodeMirror.setValue(localStorage.htmlContent)
+                }
                 var showTips = function (editor, change, type) {
                     //任意键触发autocomplet
                     if (change.origin == "+input") {

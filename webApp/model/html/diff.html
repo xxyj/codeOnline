@@ -8,15 +8,21 @@
     <link rel=stylesheet href="../../css/merge.css">
 
     <style type='text/css' rel="stylesheet">
-        html,body,#view,.CodeMirror-merge,.CodeMirror-merge-pane,.CodeMirror-merge .CodeMirror{
-            height:100%;
-            margin:0px;
-            border:0px;
-            padding:0px;
+        html,
+        body,
+        #view,
+        .CodeMirror-merge,
+        .CodeMirror-merge-pane,
+        .CodeMirror-merge .CodeMirror {
+            height: 100%;
+            margin: 0px;
+            border: 0px;
+            padding: 0px;
         }
+
         body {
             background: #dbdbdb;
-             overflow-y: hidden;
+            overflow-y: hidden;
         }
 
         .CodeMirror {
@@ -67,7 +73,9 @@
     <script src="../../js/diff.js"></script>
     <script src="../../js/merge.js"></script>
     <script>
-        var left="", right="", dv, panes = 2,
+        var left = "",
+            right = "",
+            dv, panes = 2,
             highlight = true,
             connect = "align",
             collapse = false;
@@ -95,8 +103,8 @@
         }
 
         window.onload = function () {
-            left = localStorage && localStorage.getItem("leftContent")
-            right = localStorage && localStorage.getItem("rightContent")
+            left = localStorage.getItem("leftContent") || ""
+            right = localStorage.getItem("rightContent") || ""
             initUI();
             let d = document.createElement("div");
             d.style.cssText = "width: 50px; margin: 7px; height: 14px";
