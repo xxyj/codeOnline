@@ -161,9 +161,9 @@
                     showTips(editor, change, 1)
                 });
                 if (localStorage) {
-                    jsCodeMirror.setValue(localStorage.jsContent)
-                    cssCodeMirror.setValue(localStorage.cssContent)
-                    htmlCodeMirror.setValue(localStorage.htmlContent)
+                    jsCodeMirror.setValue(localStorage.jsContent || "")
+                    cssCodeMirror.setValue(localStorage.cssContent || "")
+                    htmlCodeMirror.setValue(localStorage.htmlContent || "")
                 }
                 var showTips = function (editor, change, type) {
                     //任意键触发autocomplet
